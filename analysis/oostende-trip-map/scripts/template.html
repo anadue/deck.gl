@@ -171,12 +171,21 @@ footer{flex:0 0 auto;padding:8px 18px;background:var(--navy);border-top:1px soli
         <label class="tog"><input type="checkbox" id="lEp"><span class="swatch" style="background:#FFB199"></span>Individual trip destinations</label>
         <div class="row" style="margin-top:8px"><label class="sm">Map</label>
           <select id="basemap">
-            <option value="dark" selected>OSM · dark</option>
+            <option value="offline" selected>Built-in (no tiles)</option>
+            <option value="dark">OSM · dark</option>
             <option value="light">OSM · muted</option>
             <option value="osm">OSM · standard</option>
+            <option value="custom">Custom tile URL…</option>
             <option value="none">No basemap</option>
           </select>
         </div>
+        <div id="tileBox" hidden>
+          <input type="text" id="tileUrl" placeholder="https://…/{z}/{x}/{y}.png?key=YOUR_KEY">
+          <button class="act" id="tileApply" style="margin-top:5px">Use these tiles</button>
+          <p class="hint">Any XYZ raster endpoint — MapTiler, Stadia, Thunderforest, Mapbox raster,
+          Google via your own tile proxy, or an internal server. Saved in this browser only.</p>
+        </div>
+        <label class="tog"><input type="checkbox" id="lLabels" checked>Place labels</label>
       </div>
       <div class="grp">
         <h2>Export</h2>
@@ -208,6 +217,7 @@ footer{flex:0 0 auto;padding:8px 18px;background:var(--navy);border-top:1px soli
 <script>
 const META = __META__;
 const LM = __LANDMARKS__;
+const BASE_GEO = __BASEMAP__;
 const $ = s => document.querySelector(s);
 const fmt = n => n.toLocaleString('en-GB');
 const CELLS = {150:{lat:135,lon:215},250:{lat:225,lon:359},500:{lat:450,lon:718}};
@@ -224,9 +234,9 @@ let A = null, N = 0, deckgl = null;
 let sel = null, selN = 0, agg = null;
 const state = {
   d0:0, d1:0, h0:0, h1:23, dow:new Set([0,1,2,3,4,5,6]),
-  durMax:120, distMax:35, cell:250, minFlow:8, extruded:false,
-  startCell:null, endCell:null, basemap:'dark',
-  layers:{start:true,end:false,flow:true,sp:false,ep:false}
+  durMax:120, distMax:35, cell:250, minFlow:8, extruded:false, zoom:12.55,
+  startCell:null, endCell:null, basemap:'offline', tileUrl:'',
+  layers:{start:true,end:false,flow:true,sp:false,ep:false,labels:true}
 };
 
 /* ---------- data ---------- */
@@ -357,12 +367,45 @@ function recompute(){
          maxFlow:flowArr.length?flowArr[0].c:1};
 }
 
+/* ---------- offline vector basemap ---------- */
+const LAND = {Oostende:[30,38,66], Bredene:[28,42,68], Middelkerke:[27,36,58]};
+function offlineBasemap(){
+  const {PolygonLayer} = deck;
+  return [new PolygonLayer({
+    id:'land', data:BASE_GEO, getPolygon:o=>o.r,
+    getFillColor:o=>LAND[o.c]||[28,36,60], getLineColor:[54,66,104,220],
+    getLineWidth:12, lineWidthUnits:'meters', lineWidthMinPixels:0.6,
+    stroked:true, filled:true, pickable:false
+  })];
+}
+function labelLayers(){
+  if(!state.layers.labels) return [];
+  const {TextLayer, ScatterplotLayer} = deck;
+  const z = state.zoom;
+  const pts = LM.filter(l => l[3] <= z + 0.01).map(([name,lat,lon])=>({name, p:[lon,lat]}));
+  const CHARS = [...new Set(LM.map(l=>l[0]).join('') + '0123456789')];
+  return [
+    new ScatterplotLayer({id:'lm-dots', data:pts, getPosition:o=>o.p, getRadius:2.2,
+      radiusUnits:'pixels', getFillColor:[164,174,208,190], pickable:false}),
+    new TextLayer({id:'lm-labels', data:pts, getPosition:o=>o.p, getText:o=>o.name,
+      characterSet:CHARS, getSize:11, sizeUnits:'pixels', getColor:[199,208,235,240],
+      getTextAnchor:'start', getAlignmentBaseline:'center', getPixelOffset:[7,0],
+      fontFamily:"'Open Sans', system-ui, sans-serif", fontWeight:600,
+      fontSettings:{sdf:true, buffer:6}, outlineWidth:2.5, outlineColor:[10,13,28,235],
+      pickable:false, updateTriggers:{getText:[z]}})
+  ];
+}
+
 /* ---------- layers ---------- */
 function makeLayers(){
   const {PolygonLayer, ArcLayer, ScatterplotLayer, TileLayer, BitmapLayer} = deck;
   const step = agg.step, L = [];
-  if(state.basemap !== 'none'){
-    const bm = BASEMAPS[state.basemap];
+  if(state.basemap === 'offline'){
+    L.push(...offlineBasemap());
+  } else if(state.basemap === 'custom' ? !!state.tileUrl : state.basemap !== 'none'){
+    const bm = state.basemap==='custom'
+      ? {url:state.tileUrl, desaturate:0, tint:[255,255,255], opacity:1}
+      : BASEMAPS[state.basemap];
     L.push(new TileLayer({
       id:'basemap-'+state.basemap, data:bm.url, minZoom:0, maxZoom:19, tileSize:256,
       opacity:bm.opacity,
@@ -412,6 +455,7 @@ function makeLayers(){
       onClick:o=>{ setStart(o.object.sk,true); setEnd(o.object.ek); return true; },
       updateTriggers:{getSourceColor:[agg.maxFlow],getTargetColor:[agg.maxFlow],getWidth:[agg.maxFlow]}}));
   }
+  L.push(...labelLayers());
   return L;
 }
 function tooltip({object, layer}){
@@ -508,7 +552,12 @@ function renderLegend(){
     <div class="ramp" style="background:linear-gradient(90deg,${c})"></div>
     <div style="color:#98A0BF">1 → ${fmt(agg.maxEnd)}</div>
     <div style="margin-top:6px">Arc width = trips on that origin→destination pair</div>`;
-  $('#attrib').innerHTML = state.basemap==='none' ? 'deck.gl' :
+  const attr = {
+    offline:'Boundaries: Statbel statistical sectors (via FlexMapSuper) · place names: De Lijn stops · deck.gl',
+    none:'deck.gl',
+    custom:'Tiles: your configured provider · deck.gl'
+  };
+  $('#attrib').innerHTML = attr[state.basemap] ||
     '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors · deck.gl';
 }
 function setStart(k, noRender){ state.startCell = state.startCell===k ? null : k; if(!noRender) render(); }
@@ -578,9 +627,25 @@ function wire(){
   $('#extruded').onchange = e => { state.extruded = e.target.checked;
     if(e.target.checked) deckgl.setProps({initialViewState:{...VIEW, pitch:50, transitionDuration:400}});
     render(); };
-  const lmap = {lStart:'start', lEnd:'end', lFlow:'flow', lSp:'sp', lEp:'ep'};
+  const lmap = {lStart:'start', lEnd:'end', lFlow:'flow', lSp:'sp', lEp:'ep', lLabels:'labels'};
   Object.entries(lmap).forEach(([id,key]) => { $('#'+id).onchange = e => { state.layers[key] = e.target.checked; render(); }; });
-  $('#basemap').onchange = e => { state.basemap = e.target.value; render(); };
+  const LSKEY = 'oostende-map.tileUrl';
+  try{ const saved = localStorage.getItem(LSKEY); if(saved){ state.tileUrl = saved; $('#tileUrl').value = saved; } }catch(_){}
+  $('#basemap').onchange = e => {
+    state.basemap = e.target.value;
+    $('#tileBox').hidden = state.basemap !== 'custom';
+    render();
+  };
+  $('#tileApply').onclick = () => {
+    const u = $('#tileUrl').value.trim();
+    if(!/\{z\}/.test(u) || !/\{x\}/.test(u) || !/\{y\}/.test(u)){
+      alert('The URL needs {z}, {x} and {y} placeholders, e.g.\nhttps://tiles.example.com/{z}/{x}/{y}.png?key=…');
+      return;
+    }
+    state.tileUrl = u; state.basemap = 'custom'; $('#basemap').value = 'custom';
+    try{ localStorage.setItem(LSKEY, u); }catch(_){}
+    render();
+  };
   $('#dl').onclick = download;
   $('#reset').onclick = () => {
     state.d0 = 0; state.d1 = A.day[N-1]; state.h0 = 0; state.h1 = 23;
@@ -609,7 +674,13 @@ const VIEW = {longitude:2.9200, latitude:51.2270, zoom:12.55, pitch:0, bearing:0
        (default ≈250 m); a trip belongs to the cell nearest its pick-up / drop-off point. Flows are aggregated cell→cell and
        drawn only above the minimum-trips threshold (self-loops excluded from arcs, kept in the counts).
        CO₂ saved uses the PathFinder metric <code>(floor(Σdistance/1000)/1.6)×0.215</code>. All times local (Europe/Brussels).`;
-    deckgl = new deck.DeckGL({container:'map', initialViewState:VIEW, controller:true, layers:[], getTooltip:tooltip});
+    deckgl = new deck.DeckGL({container:'map', initialViewState:VIEW, controller:true, layers:[], getTooltip:tooltip,
+      onViewStateChange: ({viewState}) => {
+        const z = viewState.zoom;
+        // relayer only when the zoom crosses a label tier, not on every frame
+        if(Math.round(z*2) !== Math.round(state.zoom*2)){ state.zoom = z; deckgl.setProps({layers:makeLayers()}); }
+        else state.zoom = z;
+      }});
     wire();
     render();
     $('#loading').style.display = 'none';

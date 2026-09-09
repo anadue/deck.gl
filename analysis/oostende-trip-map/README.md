@@ -44,9 +44,17 @@ grid the map uses at its default cell size.
   cells, avg distance, avg duration, total distance, CO₂ saved
   (PathFinder metric `(floor(Σdistance/1000)/1.6)×0.215`).
 - **Charts**: trips per day, trips by hour, top start cells / end cells / flows.
-- **Basemap**: keyless OpenStreetMap raster tiles, in three looks — dark, muted and standard.
-  The dark look is the same OSM tiles desaturated and tinted in the shader by deck.gl's
-  `BitmapLayer` (`desaturate` + `tintColor`), so no keyed dark-tile provider is involved.
+- **Basemap**, four ways, none of which needs an account:
+  - **Built-in (default)** — a vector basemap baked into the file: Statbel statistical-sector
+    polygons for Oostende, Bredene and Middelkerke (coastline and urban grain) plus 90 named
+    places from De Lijn stops, revealed in zoom tiers ranked by how many trips each place sees.
+    It makes **no network requests at all**, so it works on a locked-down network or offline.
+  - **OSM · dark / muted / standard** — keyless OpenStreetMap raster tiles. The dark look is the
+    same tiles desaturated and tinted in deck.gl's `BitmapLayer` shader, not a keyed dark provider.
+  - **Custom tile URL** — paste any XYZ raster endpoint, including one with your own key
+    (MapTiler, Stadia, Thunderforest, Mapbox raster, Google through your own tile proxy, or an
+    internal server). Stored in that browser's `localStorage` only — no key is baked into the file.
+  - **None** — data on a plain background.
 - **Export**: "Download selection as CSV" writes the currently filtered trips.
 
 ## Rebuilding
@@ -61,5 +69,9 @@ grid the map uses at its default cell size.
 5. `node scripts/verify.js` — headless Chromium render check (KPIs, filters, cell clicks,
    console errors).
 
-`scripts/landmarks.json` is 90 De Lijn stops around Oostende, Mariakerke and Bredene
-(via the FlexMapSuper MCP), used only to give cells readable names.
+`scripts/landmarks.json` is 90 De Lijn stops around Oostende, Mariakerke and Bredene (via the
+FlexMapSuper MCP), used to give cells readable names and to label the built-in basemap;
+`scripts/rank_landmarks.py` weights each one by the trips within 350 m and assigns its zoom tier.
+`scripts/basemap.json` is the built-in vector basemap — statistical-sector polygons from the same
+MCP, simplified to ~80 m and rounded to 5 decimals (158 polygons, 62 KB); rebuild it with
+`scripts/build_basemap.py`.
