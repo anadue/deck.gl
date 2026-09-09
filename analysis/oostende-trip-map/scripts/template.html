@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oostende — trip origins &amp; destinations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<script>/* deck.gl 9.0.36 (MIT) — inlined so the file works offline */
+__DECKGL__
+</script>
+<style>
+:root{
+  --navy:#181B31; --panel:#20243c; --panel2:#272c47; --line:#343a5c;
+  --green:#4CDA96; --teal:#3CDBC0; --lime:#A8C910; --coral:#FF7A59; --amber:#FFC300;
+  --text:#EAEDF6; --dim:#98A0BF;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--navy);color:var(--text);
+  font-family:'Open Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px}
+h1,h2,h3,.num{font-family:'Rajdhani','Open Sans',system-ui,sans-serif;letter-spacing:.02em}
+#app{display:flex;flex-direction:column;height:100%}
+header{display:flex;align-items:center;gap:18px;padding:10px 18px;background:linear-gradient(90deg,#181B31,#1d2140 60%,#181B31);
+  border-bottom:1px solid var(--line);flex:0 0 auto}
+header .logo svg,header .logo img{height:30px;width:auto;display:block}
+header .title{flex:1;min-width:0}
+header .title h1{margin:0;font-size:20px;font-weight:700;line-height:1.15}
+header .title p{margin:2px 0 0;color:var(--dim);font-size:12px}
+.badge{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:6px 10px;color:var(--dim);font-size:11px;white-space:nowrap}
+.badge svg{height:18px;width:auto}
+main{flex:1;display:flex;min-height:0}
+#side{width:320px;flex:0 0 320px;background:var(--panel);border-right:1px solid var(--line);
+  overflow-y:auto;padding:14px}
+#stage{flex:1;display:flex;flex-direction:column;min-width:0}
+#mapwrap{flex:1;position:relative;min-height:280px;background:#0d1020}
+#map{position:absolute;inset:0}
+#attrib{position:absolute;right:6px;bottom:4px;font-size:10px;color:#cfd6ee;background:rgba(24,27,49,.72);
+  padding:2px 7px;border-radius:4px;z-index:3}
+#attrib a{color:#cfd6ee}
+#legend{position:absolute;left:10px;bottom:10px;background:rgba(24,27,49,.88);border:1px solid var(--line);
+  border-radius:8px;padding:9px 11px;z-index:3;font-size:11px;line-height:1.5}
+.ramp{height:8px;width:120px;border-radius:3px;margin:3px 0 2px}
+#kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(114px,1fr));gap:1px;background:var(--line);
+  border-bottom:1px solid var(--line);flex:0 0 auto}
+.kpi{background:var(--navy);padding:8px 10px}
+.kpi .v{font-family:'Rajdhani';font-size:20px;font-weight:700;line-height:1.1;white-space:nowrap}
+.kpi .l{color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
+#charts{flex:0 0 auto;display:flex;gap:14px;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line);
+  overflow-x:auto}
+.chart{flex:1;min-width:230px}
+.chart h3{margin:0 0 5px;font-size:12px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.chart svg{display:block;width:100%;height:74px;overflow:visible}
+.tables{display:flex;gap:14px;flex:0 0 auto}
+table.top{border-collapse:collapse;font-size:11.5px;width:100%}
+table.top td{padding:2px 6px 2px 0;white-space:nowrap}
+table.top td.n{text-align:right;color:var(--green);font-family:'Rajdhani';font-weight:600}
+table.top tr{cursor:pointer}
+table.top tr:hover td{color:#fff}
+.grp{margin-bottom:16px}
+.grp>h2{margin:0 0 7px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+.row{display:flex;gap:7px;align-items:center;margin-bottom:7px}
+label.sm{color:var(--dim);font-size:11px;min-width:32px}
+input[type=date],input[type=number],select{background:var(--panel2);border:1px solid var(--line);color:var(--text);
+  border-radius:6px;padding:5px 7px;font:inherit;font-size:11.5px;width:100%}
+input[type=range]{width:100%;accent-color:var(--green)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{border:1px solid var(--line);background:var(--panel2);color:var(--dim);border-radius:999px;
+  padding:3px 9px;font-size:11px;cursor:pointer;user-select:none}
+.chip.on{background:var(--green);border-color:var(--green);color:#10241c;font-weight:600}
+.chip.sq{border-radius:6px}
+.tog{display:flex;align-items:center;gap:7px;padding:4px 0;cursor:pointer;font-size:12px}
+.tog input{accent-color:var(--green);width:14px;height:14px}
+.swatch{width:10px;height:10px;border-radius:2px;flex:0 0 auto}
+.val{color:var(--text);font-family:'Rajdhani';font-weight:600;font-size:13px;min-width:74px;text-align:right}
+button.act{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:6px;
+  padding:6px 9px;font:inherit;font-size:11.5px;cursor:pointer;width:100%}
+button.act:hover{border-color:var(--green);color:var(--green)}
+button.act.primary{background:var(--green);color:#10241c;border-color:var(--green);font-weight:600}
+.selcell{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--panel2);
+  border:1px solid var(--line);border-radius:6px;padding:5px 8px;margin-bottom:5px;font-size:11.5px}
+.selcell b{font-family:'Rajdhani';font-size:12.5px}
+.selcell .x{cursor:pointer;color:var(--dim);padding:0 3px}
+.selcell .x:hover{color:var(--coral)}
+.hint{color:var(--dim);font-size:10.5px;line-height:1.45;margin:4px 0 0}
+footer{flex:0 0 auto;padding:8px 18px;background:var(--navy);border-top:1px solid var(--line);
+  color:var(--dim);font-size:10.5px;line-height:1.5}
+#loading{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:12px;z-index:99;font-family:'Rajdhani';font-size:16px}
+.spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--green);border-radius:50%;
+  animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.deck-tooltip{font-family:'Open Sans',sans-serif!important;font-size:11.5px!important;background:rgba(24,27,49,.95)!important;
+  border:1px solid #343a5c!important;border-radius:7px!important;padding:7px 9px!important;line-height:1.5!important}
+@media(max-width:900px){main{flex-direction:column}#side{width:auto;flex:0 0 auto;max-height:44vh;border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div id="loading"><div class="spin"></div><div id="loadmsg">Decoding 133,395 trips…</div></div>
+<div id="app">
+  <header>
+    <div class="logo" id="opLogo">__HOPPY_LOGO__</div>
+    <div class="title">
+      <h1>Oostende — where trips start and end</h1>
+      <p id="subtitle"></p>
+    </div>
+    <div class="badge">Powered by <span class="logo">__ANADUE_LOGO__</span></div>
+  </header>
+  <main>
+    <div id="side">
+      <div class="grp">
+        <h2>Date range</h2>
+        <div class="row"><label class="sm">From</label><input type="date" id="d0"></div>
+        <div class="row"><label class="sm">To</label><input type="date" id="d1"></div>
+        <div class="chips" id="datePresets">
+          <span class="chip sq" data-days="30">Last 30d</span>
+          <span class="chip sq" data-days="90">Last 90d</span>
+          <span class="chip sq" data-days="0">All</span>
+        </div>
+      </div>
+      <div class="grp">
+        <h2>Time of day</h2>
+        <div class="row"><label class="sm">From</label><input type="range" id="h0" min="0" max="23" value="0"><span class="val" id="h0v">00:00</span></div>
+        <div class="row"><label class="sm">To</label><input type="range" id="h1" min="0" max="23" value="23"><span class="val" id="h1v">23:59</span></div>
+        <div class="chips" id="hourPresets">
+          <span class="chip sq" data-h="0,23">All day</span>
+          <span class="chip sq" data-h="6,9">Morning</span>
+          <span class="chip sq" data-h="11,14">Midday</span>
+          <span class="chip sq" data-h="16,19">Evening</span>
+          <span class="chip sq" data-h="22,23">Night</span>
+        </div>
+      </div>
+      <div class="grp">
+        <h2>Day of week</h2>
+        <div class="chips" id="dows"></div>
+        <div class="chips" style="margin-top:5px">
+          <span class="chip sq" id="wdOnly">Weekdays</span>
+          <span class="chip sq" id="weOnly">Weekend</span>
+          <span class="chip sq" id="allDays">All</span>
+        </div>
+      </div>
+      <div class="grp">
+        <h2>Trip length</h2>
+        <div class="row"><label class="sm">Dur</label><input type="range" id="durMax" min="1" max="120" value="120"><span class="val" id="durv">any</span></div>
+        <div class="row"><label class="sm">Dist</label><input type="range" id="distMax" min="1" max="35" value="35"><span class="val" id="distv">any</span></div>
+      </div>
+      <div class="grp">
+        <h2>Start / end cell filter</h2>
+        <div id="selCells"></div>
+        <p class="hint">Click a <b>start cell</b> (green) to keep only trips starting there; click an <b>end cell</b> (coral) to keep only trips ending there. Click a flow arc to lock both ends. Click again to clear.</p>
+      </div>
+      <div class="grp">
+        <h2>Cells &amp; flows</h2>
+        <div class="row"><label class="sm">Cell</label>
+          <select id="cellSize">
+            <option value="150">150 m</option>
+            <option value="250" selected>250 m</option>
+            <option value="500">500 m</option>
+          </select>
+        </div>
+        <div class="row"><label class="sm">Flows</label><input type="range" id="minFlow" min="1" max="60" value="8"><span class="val" id="minFlowV">≥8</span></div>
+        <label class="tog"><input type="checkbox" id="extruded"> 3D cell columns</label>
+      </div>
+      <div class="grp">
+        <h2>Layers</h2>
+        <label class="tog"><input type="checkbox" id="lStart" checked><span class="swatch" style="background:var(--green)"></span>Start cell clusters</label>
+        <label class="tog"><input type="checkbox" id="lEnd"><span class="swatch" style="background:var(--coral)"></span>End cell clusters</label>
+        <label class="tog"><input type="checkbox" id="lFlow" checked><span class="swatch" style="background:var(--teal)"></span>Origin → destination flows</label>
+        <label class="tog"><input type="checkbox" id="lSp"><span class="swatch" style="background:#9BF0C8"></span>Individual trip origins</label>
+        <label class="tog"><input type="checkbox" id="lEp"><span class="swatch" style="background:#FFB199"></span>Individual trip destinations</label>
+        <div class="row" style="margin-top:8px"><label class="sm">Map</label>
+          <select id="basemap">
+            <option value="dark" selected>Dark basemap</option>
+            <option value="light">Light basemap</option>
+            <option value="osm">OpenStreetMap</option>
+            <option value="none">No basemap</option>
+          </select>
+        </div>
+      </div>
+      <div class="grp">
+        <h2>Export</h2>
+        <button class="act primary" id="dl">Download selection as CSV</button>
+        <button class="act" id="reset" style="margin-top:6px">Reset all filters</button>
+      </div>
+    </div>
+    <div id="stage">
+      <div id="kpis"></div>
+      <div id="mapwrap">
+        <div id="map"></div>
+        <div id="legend"></div>
+        <div id="attrib"></div>
+      </div>
+      <div id="charts">
+        <div class="chart"><h3 id="dayTitle">Trips per day</h3><svg id="dayChart" preserveAspectRatio="none"></svg></div>
+        <div class="chart"><h3>Trips by hour of day</h3><svg id="hourChart" preserveAspectRatio="none"></svg></div>
+        <div class="chart tables">
+          <div style="flex:1"><h3>Top start cells</h3><table class="top" id="topStart"></table></div>
+          <div style="flex:1"><h3>Top end cells</h3><table class="top" id="topEnd"></table></div>
+          <div style="flex:1.2"><h3>Top flows</h3><table class="top" id="topFlow"></table></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer id="foot"></footer>
+</div>
+<script id="payload" type="application/octet-stream">__PAYLOAD__</script>
+<script>
+const META = __META__;
+const LM = __LANDMARKS__;
+const $ = s => document.querySelector(s);
+const fmt = n => n.toLocaleString('en-GB');
+const CELLS = {150:{lat:135,lon:215},250:{lat:225,lon:359},500:{lat:450,lon:718}};
+const DOWN = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const BASEMAPS = {
+  dark:'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+  light:'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+  osm:'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+};
+let A = null, N = 0, deckgl = null;
+let sel = null, selN = 0, agg = null;
+const state = {
+  d0:0, d1:0, h0:0, h1:23, dow:new Set([0,1,2,3,4,5,6]),
+  durMax:120, distMax:35, cell:250, minFlow:8, extruded:false,
+  startCell:null, endCell:null, basemap:'dark',
+  layers:{start:true,end:false,flow:true,sp:false,ep:false}
+};
+
+/* ---------- data ---------- */
+function b64ToBytes(b64){
+  const clean = b64.trim();
+  const bin = atob(clean);
+  const out = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
+  return out;
+}
+async function gunzip(bytes){
+  if(!('DecompressionStream' in window)) throw new Error('This browser lacks DecompressionStream (needs Chrome 80+, Firefox 113+, Safari 16.4+).');
+  const st = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(st).arrayBuffer());
+}
+async function load(){
+  const raw = await gunzip(b64ToBytes(document.getElementById('payload').textContent));
+  const n = META.n; N = n; const b = raw.buffer;
+  let o = 0;
+  const i32 = () => { const a = new Int32Array(b, o, n); o += 4*n; return a; };
+  const st = i32(), dur = i32(), dist = i32(), slat = i32(), slon = i32(), elat = i32(), elon = i32();
+  const day = new Uint16Array(b, o, n); o += 2*n;
+  const lmin = new Uint16Array(b, o, n); o += 2*n;
+  const dow = new Uint8Array(b, o, n); o += n;
+  for(let i=1;i<n;i++) st[i] += st[i-1];          // undo delta encoding
+  A = {st,dur,dist,slat,slon,elat,elon,day,lmin,dow};
+  state.d1 = day[n-1];
+  sel = new Int32Array(n);
+}
+
+/* ---------- helpers ---------- */
+const dayToDate = d => { const t = new Date(META.base_date+'T00:00:00Z'); t.setUTCDate(t.getUTCDate()+d); return t; };
+const dayToISO = d => dayToDate(d).toISOString().slice(0,10);
+const isoToDay = s => Math.round((new Date(s+'T00:00:00Z') - new Date(META.base_date+'T00:00:00Z'))/86400000);
+const dayLabel = d => dayToDate(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+function cellKey(latU, lonU, step){
+  const r = Math.round(latU/step.lat), c = Math.round(lonU/step.lon);
+  return r*200000 + (c+100000);
+}
+const keyToRC = k => [Math.floor(k/200000), (k%200000)-100000];
+function cellCentre(k, step){ const [r,c] = keyToRC(k); return [c*step.lon/1e5, r*step.lat/1e5]; }
+function cellPoly(k, step){
+  const [lon,lat] = cellCentre(k, step);
+  const hy = step.lat/2e5, hx = step.lon/2e5;
+  return [[lon-hx,lat-hy],[lon+hx,lat-hy],[lon+hx,lat+hy],[lon-hx,lat+hy]];
+}
+function nearestLandmark(lat, lon){
+  let best = null, bd = Infinity, bdy = 0, bdx = 0;
+  for(const [name, la, lo] of LM){
+    const dy = (lat-la)*111200, dx = (lon-lo)*69700, d = dy*dy+dx*dx;
+    if(d < bd){ bd = d; best = name; bdy = dy; bdx = dx; }
+  }
+  const dist = Math.sqrt(bd);
+  if(dist > 520) return null;
+  if(dist <= 140) return best;
+  const dirs = ['E','NE','N','NW','W','SW','S','SE'];
+  const a = Math.atan2(bdy, bdx);
+  const dir = dirs[(Math.round(a/(Math.PI/4)) + 8) % 8];
+  return best+' '+dir;
+}
+const _nameCache = new Map();
+function cellName(k, step){
+  const ck = k+'@'+step.lat;
+  if(_nameCache.has(ck)) return _nameCache.get(ck);
+  const [lon,lat] = cellCentre(k, step);
+  const lm = nearestLandmark(lat, lon);
+  const s = lm ? lm : lat.toFixed(4)+', '+lon.toFixed(4);
+  _nameCache.set(ck, s);
+  return s;
+}
+function cellCoords(k, step){ const [lon,lat] = cellCentre(k, step); return lat.toFixed(4)+', '+lon.toFixed(4); }
+function mix(c1,c2,t){ return [Math.round(c1[0]+(c2[0]-c1[0])*t),Math.round(c1[1]+(c2[1]-c1[1])*t),Math.round(c1[2]+(c2[2]-c1[2])*t)]; }
+function ramp(stops, t){
+  t = Math.max(0,Math.min(1,t));
+  const s = t*(stops.length-1), i = Math.min(stops.length-2, Math.floor(s));
+  return mix(stops[i], stops[i+1], s-i);
+}
+const GREEN = [[19,58,52],[36,140,106],[76,218,150],[190,255,224]];
+const CORAL = [[62,30,40],[168,66,58],[255,122,89],[255,209,140]];
+
+/* ---------- filter + aggregate ---------- */
+function recompute(){
+  const {day,lmin,dow,dur,dist,slat,slon,elat,elon,st} = A;
+  const step = CELLS[state.cell];
+  const durCap = state.durMax>=120 ? Infinity : state.durMax*60;
+  const distCap = state.distMax>=35 ? Infinity : state.distMax*1000;
+  const dm = [0,0,0,0,0,0,0].map((_,i)=>state.dow.has(i));
+  const sKeyF = state.startCell, eKeyF = state.endCell;
+  let m=0, sumDist=0, sumDur=0;
+  const perDay = new Int32Array(state.d1-state.d0+1), perHour = new Int32Array(24);
+  const startCells = new Map(), endCells = new Map(), flows = new Map(), cellIdx = new Map();
+  const cellOf = k => { let i = cellIdx.get(k); if(i===undefined){ i = cellIdx.size; cellIdx.set(k,i);} return i; };
+  const idxCell = [];
+  for(let i=0;i<N;i++){
+    const d = day[i];
+    if(d < state.d0 || d > state.d1) continue;
+    const h = (lmin[i]/60)|0;
+    if(h < state.h0 || h > state.h1) continue;
+    if(!dm[dow[i]]) continue;
+    if(dur[i] > durCap) continue;
+    if(dist[i] > distCap) continue;
+    const sk = cellKey(slat[i], slon[i], step);
+    if(sKeyF !== null && sk !== sKeyF) continue;
+    const ek = cellKey(elat[i], elon[i], step);
+    if(eKeyF !== null && ek !== eKeyF) continue;
+    sel[m++] = i;
+    sumDist += dist[i]; sumDur += dur[i];
+    perDay[d-state.d0]++; perHour[h]++;
+    startCells.set(sk,(startCells.get(sk)||0)+1);
+    endCells.set(ek,(endCells.get(ek)||0)+1);
+    const si = cellOf(sk), ei = cellOf(ek);
+    if(idxCell[si]===undefined) idxCell[si]=sk;
+    if(idxCell[ei]===undefined) idxCell[ei]=ek;
+    const fk = si*100000+ei;
+    flows.set(fk,(flows.get(fk)||0)+1);
+  }
+  selN = m;
+  const flowArr = [];
+  for(const [fk,c] of flows){
+    if(c < state.minFlow) continue;
+    const si = Math.floor(fk/100000), ei = fk%100000;
+    const sk = idxCell[si], ek = idxCell[ei];
+    flowArr.push({sk, ek, c, from:cellCentre(sk,step), to:cellCentre(ek,step), self: sk===ek});
+  }
+  flowArr.sort((a,b)=>b.c-a.c);
+  agg = {step, startCells, endCells, flows:flowArr, perDay, perHour, sumDist, sumDur,
+         maxStart:Math.max(1,...startCells.values()), maxEnd:Math.max(1,...endCells.values()),
+         maxFlow:flowArr.length?flowArr[0].c:1};
+}
+
+/* ---------- layers ---------- */
+function makeLayers(){
+  const {PolygonLayer, ArcLayer, ScatterplotLayer, TileLayer, BitmapLayer} = deck;
+  const step = agg.step, L = [];
+  if(state.basemap !== 'none'){
+    L.push(new TileLayer({
+      id:'basemap-'+state.basemap, data:BASEMAPS[state.basemap], minZoom:0, maxZoom:19, tileSize:256,
+      renderSubLayers: p => new BitmapLayer(p, {data:null, image:p.data,
+        bounds:[p.tile.boundingBox[0][0],p.tile.boundingBox[0][1],p.tile.boundingBox[1][0],p.tile.boundingBox[1][1]]})
+    }));
+  }
+  const cellData = (map, max) => [...map].map(([k,c]) => ({k, c, polygon:cellPoly(k,step), t:Math.sqrt(c/max)}));
+  const elev = c => state.extruded ? c*(state.cell/250)*6 : 0;
+  if(state.layers.start){
+    const d = cellData(agg.startCells, agg.maxStart);
+    L.push(new PolygonLayer({id:'startCells', data:d, pickable:true, extruded:state.extruded,
+      getPolygon:o=>o.polygon, getFillColor:o=>[...ramp(GREEN,o.t), state.extruded?230:170],
+      getLineColor:o=>state.startCell===o.k?[255,255,255,255]:[76,218,150,90],
+      getLineWidth:o=>state.startCell===o.k?26:6, lineWidthUnits:'meters', stroked:true, filled:true,
+      getElevation:o=>elev(o.c), onClick:o=>{ setStart(o.object.k); return true; },
+      updateTriggers:{getFillColor:[state.extruded],getLineColor:[state.startCell],getLineWidth:[state.startCell],getElevation:[state.extruded,state.cell]}}));
+  }
+  if(state.layers.end){
+    const d = cellData(agg.endCells, agg.maxEnd);
+    L.push(new PolygonLayer({id:'endCells', data:d, pickable:true, extruded:state.extruded,
+      getPolygon:o=>o.polygon, getFillColor:o=>[...ramp(CORAL,o.t), state.extruded?230:150],
+      getLineColor:o=>state.endCell===o.k?[255,255,255,255]:[255,122,89,90],
+      getLineWidth:o=>state.endCell===o.k?26:6, lineWidthUnits:'meters', stroked:true, filled:true,
+      getElevation:o=>elev(o.c),
+      polygonOffset:1, onClick:o=>{ setEnd(o.object.k); return true; },
+      updateTriggers:{getFillColor:[state.extruded],getLineColor:[state.endCell],getLineWidth:[state.endCell],getElevation:[state.extruded,state.cell]}}));
+  }
+  if(state.layers.sp || state.layers.ep){
+    const pts = [];
+    for(let j=0;j<selN;j++){
+      const i = sel[j];
+      if(state.layers.sp) pts.push({p:[A.slon[i]/1e5, A.slat[i]/1e5], s:1});
+      if(state.layers.ep) pts.push({p:[A.elon[i]/1e5, A.elat[i]/1e5], s:0});
+    }
+    L.push(new ScatterplotLayer({id:'pts', data:pts, getPosition:o=>o.p, radiusUnits:'meters',
+      getRadius:9, radiusMinPixels:1.1, radiusMaxPixels:5,
+      getFillColor:o=>o.s?[155,240,200,120]:[255,177,153,120], pickable:false}));
+  }
+  if(state.layers.flow){
+    L.push(new ArcLayer({id:'flows', data:agg.flows.filter(f=>!f.self).slice(0,900), pickable:true,
+      getSourcePosition:o=>o.from, getTargetPosition:o=>o.to,
+      getSourceColor:o=>[...ramp(GREEN,0.35+0.65*Math.sqrt(o.c/agg.maxFlow)),210],
+      getTargetColor:o=>[...ramp(CORAL,0.35+0.65*Math.sqrt(o.c/agg.maxFlow)),210],
+      getWidth:o=>1+5*Math.sqrt(o.c/agg.maxFlow), getHeight:0.42, greatCircle:false,
+      onClick:o=>{ setStart(o.object.sk,true); setEnd(o.object.ek); return true; },
+      updateTriggers:{getSourceColor:[agg.maxFlow],getTargetColor:[agg.maxFlow],getWidth:[agg.maxFlow]}}));
+  }
+  return L;
+}
+function tooltip({object, layer}){
+  if(!object) return null;
+  if(layer.id==='startCells'||layer.id==='endCells'){
+    const start = layer.id==='startCells';
+    const other = start ? agg.endCells.get(object.k) : agg.startCells.get(object.k);
+    return {html:`<b>${start?'Start':'End'} cell · ${cellName(object.k,agg.step)}</b><br>
+      <span style="color:#98A0BF">${cellCoords(object.k,agg.step)} · ${agg.step.lat===225?'250':agg.step.lat===135?'150':'500'} m cell</span><br>
+      <b style="color:${start?'#4CDA96':'#FF7A59'}">${fmt(object.c)}</b> trips ${start?'started':'ended'} here<br>
+      ${fmt(other||0)} trips ${start?'ended':'started'} here<br>
+      <span style="color:#98A0BF">click to filter</span>`};
+  }
+  if(layer.id==='flows'){
+    return {html:`<b>${fmt(object.c)} trips</b><br>from ${cellName(object.sk,agg.step)}<br>to ${cellName(object.ek,agg.step)}<br>
+      <span style="color:#98A0BF">click to lock both ends</span>`};
+  }
+  return null;
+}
+
+/* ---------- render ---------- */
+function render(){
+  recompute();
+  deckgl.setProps({layers:makeLayers()});
+  renderKpis(); renderCharts(); renderTables(); renderSelCells(); renderLegend();
+}
+function renderKpis(){
+  const days = agg.perDay.reduce((a,c)=>a+(c>0?1:0),0);
+  const km = agg.sumDist/1000;
+  const co2 = (Math.floor(km)/1.6)*0.215;
+  const k = [
+    ['Trips in view', fmt(selN)],
+    ['Share of all trips', (100*selN/N).toFixed(1)+'%'],
+    ['Active days', fmt(days)],
+    ['Trips / active day', days?fmt(Math.round(selN/days)):'0'],
+    ['Start cells', fmt(agg.startCells.size)],
+    ['End cells', fmt(agg.endCells.size)],
+    ['Avg distance', selN?(km/selN).toFixed(2)+' km':'—'],
+    ['Avg duration', selN?(agg.sumDur/selN/60).toFixed(1)+' min':'—'],
+    ['Total distance', fmt(Math.round(km))+' km'],
+    ['CO₂ saved', fmt(Math.round(co2))+' kg']
+  ];
+  $('#kpis').innerHTML = k.map(([l,v])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+}
+function bars(svg, vals, labels, color, fmtLab){
+  const n = vals.length, max = Math.max(1,...vals), W = 1000, H = 100, gap = n>60?0.15:0.25;
+  const bw = W/n;
+  let h = '';
+  for(let i=0;i<n;i++){
+    const bh = H*vals[i]/max;
+    h += `<rect x="${(i*bw+bw*gap/2).toFixed(2)}" y="${(H-bh).toFixed(2)}" width="${(bw*(1-gap)).toFixed(2)}" height="${bh.toFixed(2)}" fill="${color}" opacity="${.45+.55*vals[i]/max}"><title>${labels[i]}: ${fmt(vals[i])} trips</title></rect>`;
+  }
+  const el = document.querySelector(svg);
+  el.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  el.innerHTML = h;
+  if(fmtLab) fmtLab(max);
+}
+function renderCharts(){
+  const dl = [];
+  for(let d=state.d0; d<=state.d1; d++) dl.push(dayLabel(d));
+  bars('#dayChart', Array.from(agg.perDay), dl, '#4CDA96');
+  $('#dayTitle').textContent = `Trips per day · ${dayLabel(state.d0)} → ${dayLabel(state.d1)} · peak ${fmt(Math.max(0,...agg.perDay))}`;
+  bars('#hourChart', Array.from(agg.perHour), [...Array(24)].map((_,i)=>String(i).padStart(2,'0')+':00'), '#3CDBC0');
+}
+function renderTables(){
+  const step = agg.step;
+  const top = (map,n)=>[...map].sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const rowsFor = (arr, cls) => arr.map(([k,c])=>
+    `<tr data-k="${k}" data-kind="${cls}" title="${cellCoords(k,step)} · click to filter"><td>${cellName(k,step)}</td><td class="n">${fmt(c)}</td></tr>`).join('');
+  $('#topStart').innerHTML = rowsFor(top(agg.startCells,6),'s');
+  $('#topEnd').innerHTML = rowsFor(top(agg.endCells,6),'e');
+  $('#topFlow').innerHTML = agg.flows.filter(f=>!f.self).slice(0,6).map(f=>
+    `<tr data-sk="${f.sk}" data-ek="${f.ek}" title="${cellCoords(f.sk,step)} → ${cellCoords(f.ek,step)}"><td>${cellName(f.sk,step)} → ${cellName(f.ek,step)}</td><td class="n">${fmt(f.c)}</td></tr>`).join('')
+    || '<tr><td style="color:#98A0BF">no flows above threshold</td></tr>';
+  $('#topStart').onclick = e => { const tr = e.target.closest('tr'); if(tr) setStart(+tr.dataset.k); };
+  $('#topEnd').onclick = e => { const tr = e.target.closest('tr'); if(tr) setEnd(+tr.dataset.k); };
+  $('#topFlow').onclick = e => { const tr = e.target.closest('tr'); if(!tr||!tr.dataset.sk) return; setStart(+tr.dataset.sk,true); setEnd(+tr.dataset.ek); };
+}
+function renderSelCells(){
+  let h = '';
+  if(state.startCell!==null) h += `<div class="selcell"><span><span class="swatch" style="display:inline-block;background:var(--green)"></span> Starts in <b>${cellName(state.startCell,agg.step)}</b></span><span class="x" data-c="s">✕</span></div>`;
+  if(state.endCell!==null) h += `<div class="selcell"><span><span class="swatch" style="display:inline-block;background:var(--coral)"></span> Ends in <b>${cellName(state.endCell,agg.step)}</b></span><span class="x" data-c="e">✕</span></div>`;
+  if(!h) h = '<p class="hint" style="margin:0">No cell filter — showing every origin and destination.</p>';
+  const el = $('#selCells'); el.innerHTML = h;
+  el.querySelectorAll('.x').forEach(x=>x.onclick=()=>{ if(x.dataset.c==='s') state.startCell=null; else state.endCell=null; render(); });
+}
+function renderLegend(){
+  const g = GREEN.map(c=>`rgb(${c})`).join(','), c = CORAL.map(c=>`rgb(${c})`).join(',');
+  $('#legend').innerHTML = `
+    <div><b>Trips starting</b> per ${state.cell} m cell</div>
+    <div class="ramp" style="background:linear-gradient(90deg,${g})"></div>
+    <div style="color:#98A0BF">1 → ${fmt(agg.maxStart)}</div>
+    <div style="margin-top:6px"><b>Trips ending</b> per cell</div>
+    <div class="ramp" style="background:linear-gradient(90deg,${c})"></div>
+    <div style="color:#98A0BF">1 → ${fmt(agg.maxEnd)}</div>
+    <div style="margin-top:6px">Arc width = trips on that origin→destination pair</div>`;
+  $('#attrib').innerHTML = state.basemap==='none' ? 'deck.gl' :
+    '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
+    + (state.basemap==='osm' ? '' : ' · © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>') + ' · deck.gl';
+}
+function setStart(k, noRender){ state.startCell = state.startCell===k ? null : k; if(!noRender) render(); }
+function setEnd(k){ state.endCell = state.endCell===k ? null : k; render(); }
+
+/* ---------- export ---------- */
+function download(){
+  const step = agg.step;
+  const head = 'start_epoch,start_local,end_epoch,date_local,hour_local,weekday,start_lat,start_lon,end_lat,end_lon,distance_m,duration_s,duration_min,start_cell_lat,start_cell_lon,end_cell_lat,end_cell_lon\n';
+  const out = [head];
+  for(let j=0;j<selN;j++){
+    const i = sel[j];
+    const d = dayToISO(A.day[i]), hh = String((A.lmin[i]/60)|0).padStart(2,'0'), mm = String(A.lmin[i]%60).padStart(2,'0');
+    const sk = cellKey(A.slat[i],A.slon[i],step), ek = cellKey(A.elat[i],A.elon[i],step);
+    const [sclon,sclat] = cellCentre(sk,step), [eclon,eclat] = cellCentre(ek,step);
+    out.push([A.st[i], d+' '+hh+':'+mm, A.st[i]+A.dur[i], d, hh, DOWN[A.dow[i]],
+      (A.slat[i]/1e5).toFixed(5),(A.slon[i]/1e5).toFixed(5),(A.elat[i]/1e5).toFixed(5),(A.elon[i]/1e5).toFixed(5),
+      A.dist[i], A.dur[i], (A.dur[i]/60).toFixed(1),
+      sclat.toFixed(5), sclon.toFixed(5), eclat.toFixed(5), eclon.toFixed(5)].join(',')+'\n');
+  }
+  const url = URL.createObjectURL(new Blob(out,{type:'text/csv'}));
+  const a = document.createElement('a');
+  a.href = url; a.download = `oostende-trips-${dayToISO(state.d0)}_${dayToISO(state.d1)}.csv`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+
+/* ---------- ui wiring ---------- */
+function wire(){
+  $('#d0').min = $('#d1').min = META.base_date;
+  $('#d0').max = $('#d1').max = dayToISO(state.d1);
+  $('#d0').value = dayToISO(state.d0); $('#d1').value = dayToISO(state.d1);
+  $('#d0').onchange = e => { state.d0 = Math.max(0, isoToDay(e.target.value)); if(state.d0>state.d1){state.d1=state.d0;$('#d1').value=dayToISO(state.d1);} render(); };
+  $('#d1').onchange = e => { state.d1 = Math.min(A.day[N-1], isoToDay(e.target.value)); if(state.d1<state.d0){state.d0=state.d1;$('#d0').value=dayToISO(state.d0);} render(); };
+  $('#datePresets').onclick = e => {
+    if(!e.target.dataset.days) return;
+    const dd = +e.target.dataset.days, last = A.day[N-1];
+    state.d1 = last; state.d0 = dd ? Math.max(0,last-dd+1) : 0;
+    $('#d0').value = dayToISO(state.d0); $('#d1').value = dayToISO(state.d1); render();
+  };
+  const hlab = h => String(h).padStart(2,'0')+':00';
+  $('#h0').oninput = e => { state.h0 = +e.target.value; if(state.h0>state.h1){state.h1=state.h0;$('#h1').value=state.h1;} syncH(); render(); };
+  $('#h1').oninput = e => { state.h1 = +e.target.value; if(state.h1<state.h0){state.h0=state.h1;$('#h0').value=state.h0;} syncH(); render(); };
+  function syncH(){ $('#h0v').textContent = hlab(state.h0); $('#h1v').textContent = String(state.h1).padStart(2,'0')+':59'; }
+  $('#hourPresets').onclick = e => {
+    if(!e.target.dataset.h) return;
+    const [a,b] = e.target.dataset.h.split(',').map(Number);
+    state.h0=a; state.h1=b; $('#h0').value=a; $('#h1').value=b; syncH(); render();
+  };
+  const dowsEl = $('#dows');
+  dowsEl.innerHTML = DOWN.map((d,i)=>`<span class="chip on" data-d="${i}">${d}</span>`).join('');
+  dowsEl.onclick = e => {
+    const d = e.target.dataset.d; if(d===undefined) return;
+    const i = +d;
+    if(state.dow.has(i)) state.dow.delete(i); else state.dow.add(i);
+    if(state.dow.size===0) state.dow.add(i);
+    syncDows(); render();
+  };
+  function syncDows(){ dowsEl.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on', state.dow.has(+c.dataset.d))); }
+  const setDows = arr => { state.dow = new Set(arr); syncDows(); render(); };
+  $('#wdOnly').onclick = ()=>setDows([0,1,2,3,4]);
+  $('#weOnly').onclick = ()=>setDows([5,6]);
+  $('#allDays').onclick = ()=>setDows([0,1,2,3,4,5,6]);
+  $('#durMax').oninput = e => { state.durMax = +e.target.value; $('#durv').textContent = state.durMax>=120?'any':'≤'+state.durMax+' min'; render(); };
+  $('#distMax').oninput = e => { state.distMax = +e.target.value; $('#distv').textContent = state.distMax>=35?'any':'≤'+state.distMax+' km'; render(); };
+  $('#cellSize').onchange = e => { state.cell = +e.target.value; state.startCell = null; state.endCell = null; render(); };
+  $('#minFlow').oninput = e => { state.minFlow = +e.target.value; $('#minFlowV').textContent = '≥'+state.minFlow; render(); };
+  $('#extruded').onchange = e => { state.extruded = e.target.checked;
+    if(e.target.checked) deckgl.setProps({initialViewState:{...VIEW, pitch:50, transitionDuration:400}});
+    render(); };
+  const lmap = {lStart:'start', lEnd:'end', lFlow:'flow', lSp:'sp', lEp:'ep'};
+  Object.entries(lmap).forEach(([id,key]) => { $('#'+id).onchange = e => { state.layers[key] = e.target.checked; render(); }; });
+  $('#basemap').onchange = e => { state.basemap = e.target.value; render(); };
+  $('#dl').onclick = download;
+  $('#reset').onclick = () => {
+    state.d0 = 0; state.d1 = A.day[N-1]; state.h0 = 0; state.h1 = 23;
+    state.dow = new Set([0,1,2,3,4,5,6]); state.durMax = 120; state.distMax = 35;
+    state.startCell = state.endCell = null; state.minFlow = 8; state.cell = 250;
+    $('#d0').value = dayToISO(0); $('#d1').value = dayToISO(state.d1);
+    $('#h0').value = 0; $('#h1').value = 23; syncH(); syncDows();
+    $('#durMax').value = 120; $('#distMax').value = 35; $('#durv').textContent='any'; $('#distv').textContent='any';
+    $('#cellSize').value = 250; $('#minFlow').value = 8; $('#minFlowV').textContent = '≥8';
+    render();
+  };
+  syncH();
+}
+const VIEW = {longitude:2.9200, latitude:51.2270, zoom:12.55, pitch:0, bearing:0};
+
+/* ---------- boot ---------- */
+(async () => {
+  try{
+    await load();
+    $('#subtitle').textContent =
+      `${fmt(N)} trips · ${dayLabel(0)} → ${dayLabel(A.day[N-1])} · supplier hoppy_oostende_sc (1250634911) · times in Europe/Brussels`;
+    $('#foot').innerHTML =
+      `Source: PathFinder <code>event_renttrans</code>, data_supplier_id 1250634911 (hoppy_oostende_sc). Window requested: last 365 days
+       (10 Sep 2025 – 9 Sep 2026); the Oostende feed carries trips from 15 Dec 2025 onwards, so ${fmt(N)} trips over
+       ${A.day[N-1]+1} days are shown. Every trip has both an origin and a destination fix. Cells are a fixed lat/lon grid
+       (default ≈250 m); a trip belongs to the cell nearest its pick-up / drop-off point. Flows are aggregated cell→cell and
+       drawn only above the minimum-trips threshold (self-loops excluded from arcs, kept in the counts).
+       CO₂ saved uses the PathFinder metric <code>(floor(Σdistance/1000)/1.6)×0.215</code>. All times local (Europe/Brussels).`;
+    deckgl = new deck.DeckGL({container:'map', initialViewState:VIEW, controller:true, layers:[], getTooltip:tooltip});
+    wire();
+    render();
+    $('#loading').style.display = 'none';
+  }catch(err){
+    $('#loading').innerHTML = '<div style="max-width:420px;text-align:center;color:#FF7A59">Could not load the trip data:<br>'+err.message+'</div>';
+    console.error(err);
+  }
+})();
+</script>
+</body>
+</html>
