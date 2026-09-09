@@ -7,7 +7,7 @@ Interactive map and trip-level CSV for the Hoppy Oostende fleet, built from Path
 
 | File | What it is |
 |---|---|
-| `oostende-trip-origins-destinations.html` | Self-contained interactive map (3.8 MB). deck.gl is inlined, so it works offline apart from the basemap tiles. Open it in a browser — no server needed. |
+| `oostende-trip-origins-destinations.html` | Self-contained interactive map (3.8 MB). deck.gl is inlined, so it works offline apart from the basemap tiles. Open it in a browser — no server needed, no API key. |
 | `oostende_trips.csv.gz` | One row per trip, 133,395 rows (30 MB uncompressed). `gunzip` to use. |
 | `scripts/` | Everything needed to rebuild both artefacts. |
 
@@ -44,6 +44,9 @@ grid the map uses at its default cell size.
   cells, avg distance, avg duration, total distance, CO₂ saved
   (PathFinder metric `(floor(Σdistance/1000)/1.6)×0.215`).
 - **Charts**: trips per day, trips by hour, top start cells / end cells / flows.
+- **Basemap**: keyless OpenStreetMap raster tiles, in three looks — dark, muted and standard.
+  The dark look is the same OSM tiles desaturated and tinted in the shader by deck.gl's
+  `BitmapLayer` (`desaturate` + `tintColor`), so no keyed dark-tile provider is involved.
 - **Export**: "Download selection as CSV" writes the currently filtered trips.
 
 ## Rebuilding

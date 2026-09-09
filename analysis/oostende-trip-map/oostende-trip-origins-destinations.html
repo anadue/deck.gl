@@ -4243,11 +4243,11 @@ main{flex:1;display:flex;min-height:0}
 #legend{position:absolute;left:10px;bottom:10px;background:rgba(24,27,49,.88);border:1px solid var(--line);
   border-radius:8px;padding:9px 11px;z-index:3;font-size:11px;line-height:1.5}
 .ramp{height:8px;width:120px;border-radius:3px;margin:3px 0 2px}
-#kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(114px,1fr));gap:1px;background:var(--line);
+#kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:1px;background:var(--line);
   border-bottom:1px solid var(--line);flex:0 0 auto}
-.kpi{background:var(--navy);padding:8px 10px}
+.kpi{background:var(--navy);padding:8px 9px}
 .kpi .v{font-family:'Rajdhani';font-size:20px;font-weight:700;line-height:1.1;white-space:nowrap}
-.kpi .l{color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
+.kpi .l{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
 #charts{flex:0 0 auto;display:flex;gap:14px;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line);
   overflow-x:auto}
 .chart{flex:1;min-width:230px}
@@ -4377,9 +4377,9 @@ footer{flex:0 0 auto;padding:8px 18px;background:var(--navy);border-top:1px soli
         <label class="tog"><input type="checkbox" id="lEp"><span class="swatch" style="background:#FFB199"></span>Individual trip destinations</label>
         <div class="row" style="margin-top:8px"><label class="sm">Map</label>
           <select id="basemap">
-            <option value="dark" selected>Dark basemap</option>
-            <option value="light">Light basemap</option>
-            <option value="osm">OpenStreetMap</option>
+            <option value="dark" selected>OSM · dark</option>
+            <option value="light">OSM · muted</option>
+            <option value="osm">OSM · standard</option>
             <option value="none">No basemap</option>
           </select>
         </div>
@@ -4462,10 +4462,13 @@ const $ = s => document.querySelector(s);
 const fmt = n => n.toLocaleString('en-GB');
 const CELLS = {150:{lat:135,lon:215},250:{lat:225,lon:359},500:{lat:450,lon:718}};
 const DOWN = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const OSM_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+// Keyless OpenStreetMap tiles. The "dark" option is the same tiles desaturated and
+// tinted locally by deck.gl, so no API key or third-party dark-tile service is needed.
 const BASEMAPS = {
-  dark:'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-  light:'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-  osm:'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+  dark:  {url:OSM_URL, desaturate:0.88, tint:[64,72,98],  opacity:1},
+  light: {url:OSM_URL, desaturate:0.35, tint:[255,255,255], opacity:0.9},
+  osm:   {url:OSM_URL, desaturate:0,   tint:[255,255,255], opacity:1}
 };
 let A = null, N = 0, deckgl = null;
 let sel = null, selN = 0, agg = null;
@@ -4609,9 +4612,12 @@ function makeLayers(){
   const {PolygonLayer, ArcLayer, ScatterplotLayer, TileLayer, BitmapLayer} = deck;
   const step = agg.step, L = [];
   if(state.basemap !== 'none'){
+    const bm = BASEMAPS[state.basemap];
     L.push(new TileLayer({
-      id:'basemap-'+state.basemap, data:BASEMAPS[state.basemap], minZoom:0, maxZoom:19, tileSize:256,
+      id:'basemap-'+state.basemap, data:bm.url, minZoom:0, maxZoom:19, tileSize:256,
+      opacity:bm.opacity,
       renderSubLayers: p => new BitmapLayer(p, {data:null, image:p.data,
+        desaturate:bm.desaturate, tintColor:bm.tint,
         bounds:[p.tile.boundingBox[0][0],p.tile.boundingBox[0][1],p.tile.boundingBox[1][0],p.tile.boundingBox[1][1]]})
     }));
   }
@@ -4753,8 +4759,7 @@ function renderLegend(){
     <div style="color:#98A0BF">1 → ${fmt(agg.maxEnd)}</div>
     <div style="margin-top:6px">Arc width = trips on that origin→destination pair</div>`;
   $('#attrib').innerHTML = state.basemap==='none' ? 'deck.gl' :
-    '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
-    + (state.basemap==='osm' ? '' : ' · © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>') + ' · deck.gl';
+    '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors · deck.gl';
 }
 function setStart(k, noRender){ state.startCell = state.startCell===k ? null : k; if(!noRender) render(); }
 function setEnd(k){ state.endCell = state.endCell===k ? null : k; render(); }
