@@ -13,6 +13,9 @@ html=html.replace("__HOPPY_LOGO__",logo("hoppy_logo.svg",30))
 html=html.replace("__ANADUE_LOGO__",logo("anadue_logo.svg",18))
 html=html.replace("__DECKGL__",open(W+"package/dist.min.js").read().replace("</script","<\\/script"))
 html=html.replace("__LANDMARKS__",open(W+"landmarks.json").read().strip())
+html=html.replace("__BASEMAP__",open(W+"basemap.json").read().strip())
+import os
+html=html.replace("__GMAPS_KEY__", os.environ.get("GMAPS_KEY",""))
 html=html.replace("__META__",open(W+"meta.json").read().strip())
 html=html.replace("__PAYLOAD__",open(W+"payload.b64").read().strip())
 out=W+"oostende-trip-origins-destinations.html"

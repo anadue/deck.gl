@@ -44,7 +44,15 @@ grid the map uses at its default cell size.
   cells, avg distance, avg duration, total distance, CO₂ saved
   (PathFinder metric `(floor(Σdistance/1000)/1.6)×0.215`).
 - **Charts**: trips per day, trips by hour, top start cells / end cells / flows.
-- **Basemap**, four ways, none of which needs an account:
+- **Basemap**, several ways:
+  - **Google Maps** — streets (dark), streets (light), satellite, satellite + labels, and terrain,
+    drawn by the Maps JavaScript API with the deck.gl layers on top through `GoogleMapsOverlay`.
+    **Street View**: drag Google's pegman, or tick "Street View — click the map to look" and click
+    any point or cell to open a panorama panel (cell filtering pauses while that is on).
+    The key is **not** committed: this copy ships with an empty `GMAPS_KEY`, so it falls back to the
+    built-in basemap and invites you to paste a key (Map → Google Maps API key, kept in
+    `localStorage`). Bake one in at build time instead with
+    `GMAPS_KEY=AIza… python3 scripts/assemble_html.py`.
   - **Built-in (default)** — a vector basemap baked into the file: Statbel statistical-sector
     polygons for Oostende, Bredene and Middelkerke (coastline and urban grain) plus 90 named
     places from De Lijn stops, revealed in zoom tiers ranked by how many trips each place sees.
@@ -55,6 +63,8 @@ grid the map uses at its default cell size.
     (MapTiler, Stadia, Thunderforest, Mapbox raster, Google through your own tile proxy, or an
     internal server). Stored in that browser's `localStorage` only — no key is baked into the file.
   - **None** — data on a plain background.
+
+  Everything except the Google options works with no account and no key.
 - **Export**: "Download selection as CSV" writes the currently filtered trips.
 
 ## Rebuilding
