@@ -11,22 +11,34 @@
 __DECKGL__
 </script>
 <style>
-:root{
-  --navy:#181B31; --panel:#20243c; --panel2:#272c47; --line:#343a5c;
+:root{                                  /* light (default) */
+  --navy:#181B31;                       /* the header bar stays brand navy in both themes */
+  --bg:#F4F6FB; --panel:#FFFFFF; --panel2:#EEF1F8; --line:#D9DEEC;
+  --green:#17936A; --teal:#0F8C8C; --lime:#A8C910; --coral:#D9532F; --amber:#B77900;
+  --text:#1B2038; --dim:#5D6685;
+  --tipbg:rgba(255,255,255,.97); --mapbg:#EAEEF6; --shadow:0 6px 18px rgba(24,32,64,.12);
+}
+body[data-theme="dark"]{
+  --bg:#181B31; --panel:#20243c; --panel2:#272c47; --line:#343a5c;
   --green:#4CDA96; --teal:#3CDBC0; --lime:#A8C910; --coral:#FF7A59; --amber:#FFC300;
   --text:#EAEDF6; --dim:#98A0BF;
+  --tipbg:rgba(24,27,49,.96); --mapbg:#0d1020; --shadow:0 8px 26px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--navy);color:var(--text);
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:'Open Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px}
 h1,h2,h3,.num{font-family:'Rajdhani','Open Sans',system-ui,sans-serif;letter-spacing:.02em}
 #app{display:flex;flex-direction:column;height:100%}
 header{display:flex;align-items:center;gap:18px;padding:10px 18px;background:linear-gradient(90deg,#181B31,#1d2140 60%,#181B31);
-  border-bottom:1px solid var(--line);flex:0 0 auto}
+  border-bottom:1px solid var(--line);flex:0 0 auto;color:#EAEDF6}
+header .badge{background:#20243c;border-color:#343a5c;color:#98A0BF}
+#themeBtn{background:#20243c;border:1px solid #343a5c;color:#98A0BF;border-radius:8px;padding:6px 10px;
+  font:inherit;font-size:11px;cursor:pointer;white-space:nowrap}
+#themeBtn:hover{color:#fff;border-color:#4CDA96}
 header .logo svg,header .logo img{height:30px;width:auto;display:block}
 header .title{flex:1;min-width:0}
-header .title h1{margin:0;font-size:20px;font-weight:700;line-height:1.15}
-header .title p{margin:2px 0 0;color:var(--dim);font-size:12px}
+header .title h1{margin:0;font-size:20px;font-weight:700;line-height:1.15;color:#fff}
+header .title p{margin:2px 0 0;color:#98A0BF;font-size:12px}
 .badge{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
   border-radius:8px;padding:6px 10px;color:var(--dim);font-size:11px;white-space:nowrap}
 .badge svg{height:18px;width:auto}
@@ -34,11 +46,12 @@ main{flex:1;display:flex;min-height:0}
 #side{width:320px;flex:0 0 320px;background:var(--panel);border-right:1px solid var(--line);
   overflow-y:auto;padding:14px}
 #stage{flex:1;display:flex;flex-direction:column;min-width:0}
-#mapwrap{flex:1;position:relative;min-height:280px;background:#0d1020}
+#mapwrap{flex:1;position:relative;min-height:280px;background:var(--mapbg)}
 #map{position:absolute;inset:0}
-#gmap{position:absolute;inset:0;background:#0d1020}
-#tip{position:absolute;z-index:6;pointer-events:none;max-width:270px;background:rgba(24,27,49,.96);
-  border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:11.5px;line-height:1.5}
+#gmap{position:absolute;inset:0;background:var(--mapbg)}
+#tip{position:absolute;z-index:6;pointer-events:none;max-width:270px;background:var(--tipbg);
+  border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:11.5px;line-height:1.5;
+  box-shadow:var(--shadow);color:var(--text)}
 #mapnote{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:7;background:rgba(40,26,20,.95);
   border:1px solid #7a4a2e;color:#ffd0b8;border-radius:8px;padding:8px 12px;font-size:11.5px;max-width:520px;line-height:1.5}
 #mapnote b{color:#fff}
@@ -49,15 +62,15 @@ main{flex:1;display:flex;min-height:0}
 #svhead .x{cursor:pointer}#svhead .x:hover{color:var(--coral)}
 #sv{height:250px;background:#11142a}
 @media(max-width:900px){#svpanel{width:auto;left:10px}}
-#attrib{position:absolute;right:6px;bottom:4px;font-size:10px;color:#cfd6ee;background:rgba(24,27,49,.72);
-  padding:2px 7px;border-radius:4px;z-index:3}
-#attrib a{color:#cfd6ee}
-#legend{position:absolute;left:10px;bottom:10px;background:rgba(24,27,49,.88);border:1px solid var(--line);
+#attrib{position:absolute;right:6px;bottom:4px;font-size:10px;color:var(--dim);background:var(--tipbg);
+  padding:2px 7px;border-radius:4px;z-index:3;border:1px solid var(--line)}
+#attrib a{color:var(--dim)}
+#legend{position:absolute;left:10px;bottom:10px;background:var(--tipbg);border:1px solid var(--line);box-shadow:var(--shadow);
   border-radius:8px;padding:9px 11px;z-index:3;font-size:11px;line-height:1.5}
 .ramp{height:8px;width:120px;border-radius:3px;margin:3px 0 2px}
 #kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:1px;background:var(--line);
   border-bottom:1px solid var(--line);flex:0 0 auto}
-.kpi{background:var(--navy);padding:8px 9px}
+.kpi{background:var(--panel);padding:8px 9px}
 .kpi .v{font-family:'Rajdhani';font-size:20px;font-weight:700;line-height:1.1;white-space:nowrap}
 .kpi .l{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
 #charts{flex:0 0 auto;display:flex;gap:14px;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line);
@@ -97,15 +110,15 @@ button.act.primary{background:var(--green);color:#10241c;border-color:var(--gree
 .selcell .x{cursor:pointer;color:var(--dim);padding:0 3px}
 .selcell .x:hover{color:var(--coral)}
 .hint{color:var(--dim);font-size:10.5px;line-height:1.45;margin:4px 0 0}
-footer{flex:0 0 auto;padding:8px 18px;background:var(--navy);border-top:1px solid var(--line);
+footer{flex:0 0 auto;padding:8px 18px;background:var(--panel);border-top:1px solid var(--line);
   color:var(--dim);font-size:10.5px;line-height:1.5}
-#loading{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;
   flex-direction:column;gap:12px;z-index:99;font-family:'Rajdhani';font-size:16px}
 .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--green);border-radius:50%;
   animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.deck-tooltip{font-family:'Open Sans',sans-serif!important;font-size:11.5px!important;background:rgba(24,27,49,.95)!important;
-  border:1px solid #343a5c!important;border-radius:7px!important;padding:7px 9px!important;line-height:1.5!important}
+#svpanel{box-shadow:var(--shadow)}
+.chip.on{color:#0d2a1f}
 @media(max-width:900px){main{flex-direction:column}#side{width:auto;flex:0 0 auto;max-height:44vh;border-right:0;border-bottom:1px solid var(--line)}}
 </style>
 </head>
@@ -118,6 +131,7 @@ footer{flex:0 0 auto;padding:8px 18px;background:var(--navy);border-top:1px soli
       <h1>Oostende — where trips start and end</h1>
       <p id="subtitle"></p>
     </div>
+    <button id="themeBtn" title="Switch between the light and dark look">☾ Dark</button>
     <div class="badge">Powered by <span class="logo">__ANADUE_LOGO__</span></div>
   </header>
   <main>
@@ -185,8 +199,8 @@ footer{flex:0 0 auto;padding:8px 18px;background:var(--navy);border-top:1px soli
         <div class="row" style="margin-top:8px"><label class="sm">Map</label>
           <select id="basemap">
             <optgroup label="Google Maps">
-              <option value="g-roadmap" selected>Google · streets (dark)</option>
-              <option value="g-roadmap-light">Google · streets (light)</option>
+              <option value="g-roadmap-light" selected>Google · streets (light)</option>
+              <option value="g-roadmap">Google · streets (dark)</option>
               <option value="g-satellite">Google · satellite</option>
               <option value="g-hybrid">Google · satellite + labels</option>
               <option value="g-terrain">Google · terrain</option>
@@ -271,8 +285,8 @@ let A = null, N = 0, deckgl = null;
 let sel = null, selN = 0, agg = null;
 const state = {
   d0:0, d1:0, h0:0, h1:23, dow:new Set([0,1,2,3,4,5,6]),
-  durMax:120, distMax:35, cell:250, minFlow:8, extruded:false, zoom:12.55,
-  startCell:null, endCell:null, basemap:'g-roadmap', tileUrl:'', svMode:false,
+  durMax:120, distMax:35, cell:250, minFlow:8, extruded:false, zoom:12.55, theme:'light',
+  startCell:null, endCell:null, basemap:'g-roadmap-light', tileUrl:'', svMode:false,
   layers:{start:true,end:false,flow:true,sp:false,ep:false,labels:true}
 };
 
@@ -351,8 +365,20 @@ function ramp(stops, t){
   const s = t*(stops.length-1), i = Math.min(stops.length-2, Math.floor(s));
   return mix(stops[i], stops[i+1], s-i);
 }
-const GREEN = [[19,58,52],[36,140,106],[76,218,150],[190,255,224]];
-const CORAL = [[62,30,40],[168,66,58],[255,122,89],[255,209,140]];
+// Ramps run low → high: pale → deep on a light map, deep → bright on a dark one.
+const RAMPS = {
+  light:{green:[[209,245,229],[122,214,176],[38,155,113],[10,84,62]],
+         coral:[[255,226,206],[255,166,127],[221,90,52],[136,38,20]],
+         cellLine:{start:[16,120,88,110], end:[190,76,44,110], sel:[26,32,56,255]},
+         land:{Oostende:[233,238,247], Bredene:[232,240,247], Middelkerke:[234,237,244]},
+         landLine:[198,208,228,230], dot:[70,82,116,190], label:[32,40,68,245], labelHalo:[255,255,255,235]},
+  dark:{green:[[19,58,52],[36,140,106],[76,218,150],[190,255,224]],
+        coral:[[62,30,40],[168,66,58],[255,122,89],[255,209,140]],
+        cellLine:{start:[76,218,150,90], end:[255,122,89,90], sel:[255,255,255,255]},
+        land:{Oostende:[30,38,66], Bredene:[28,42,68], Middelkerke:[27,36,58]},
+        landLine:[54,66,104,220], dot:[164,174,208,190], label:[199,208,235,240], labelHalo:[10,13,28,235]}
+};
+const TH = () => RAMPS[state.theme];
 
 /* ---------- filter + aggregate ---------- */
 function recompute(){
@@ -405,12 +431,11 @@ function recompute(){
 }
 
 /* ---------- offline vector basemap ---------- */
-const LAND = {Oostende:[30,38,66], Bredene:[28,42,68], Middelkerke:[27,36,58]};
 function offlineBasemap(){
   const {PolygonLayer} = deck;
   return [new PolygonLayer({
-    id:'land', data:BASE_GEO, getPolygon:o=>o.r,
-    getFillColor:o=>LAND[o.c]||[28,36,60], getLineColor:[54,66,104,220],
+    id:'land-'+state.theme, data:BASE_GEO, getPolygon:o=>o.r,
+    getFillColor:o=>TH().land[o.c]||TH().land.Oostende, getLineColor:TH().landLine,
     getLineWidth:12, lineWidthUnits:'meters', lineWidthMinPixels:0.6,
     stroked:true, filled:true, pickable:false
   })];
@@ -423,13 +448,13 @@ function labelLayers(){
   const CHARS = [...new Set(LM.map(l=>l[0]).join('') + '0123456789')];
   return [
     new ScatterplotLayer({id:'lm-dots', data:pts, getPosition:o=>o.p, getRadius:2.2,
-      radiusUnits:'pixels', getFillColor:[164,174,208,190], pickable:false}),
+      radiusUnits:'pixels', getFillColor:TH().dot, pickable:false}),
     new TextLayer({id:'lm-labels', data:pts, getPosition:o=>o.p, getText:o=>o.name,
-      characterSet:CHARS, getSize:11, sizeUnits:'pixels', getColor:[199,208,235,240],
+      characterSet:CHARS, getSize:11, sizeUnits:'pixels', getColor:TH().label,
       getTextAnchor:'start', getAlignmentBaseline:'center', getPixelOffset:[7,0],
       fontFamily:"'Open Sans', system-ui, sans-serif", fontWeight:600,
-      fontSettings:{sdf:true, buffer:6}, outlineWidth:2.5, outlineColor:[10,13,28,235],
-      pickable:false, updateTriggers:{getText:[z]}})
+      fontSettings:{sdf:true, buffer:6}, outlineWidth:2.5, outlineColor:TH().labelHalo,
+      pickable:false, updateTriggers:{getText:[z], getColor:[state.theme]}})
   ];
 }
 
@@ -453,28 +478,31 @@ function makeLayers(){
         bounds:[p.tile.boundingBox[0][0],p.tile.boundingBox[0][1],p.tile.boundingBox[1][0],p.tile.boundingBox[1][1]]})
     }));
   }
-  const cellData = (map, max) => [...map].map(([k,c]) => ({k, c, polygon:cellPoly(k,step), t:Math.sqrt(c/max)}));
+  // On a light basemap the palest ramp stop disappears into the map, so lift the floor.
+  const floor = state.theme === 'light' ? 0.22 : 0;
+  const shade = v => floor + (1 - floor) * v;
+  const cellData = (map, max) => [...map].map(([k,c]) => ({k, c, polygon:cellPoly(k,step), t:shade(Math.sqrt(c/max))}));
   const elev = c => state.extruded ? c*(state.cell/250)*6 : 0;
   if(state.layers.start){
     const d = cellData(agg.startCells, agg.maxStart);
     L.push(new PolygonLayer({id:'startCells', data:d, pickable:true, extruded:state.extruded,
-      getPolygon:o=>o.polygon, getFillColor:o=>[...ramp(GREEN,o.t), state.extruded?230:170],
-      getLineColor:o=>state.startCell===o.k?[255,255,255,255]:[76,218,150,90],
+      getPolygon:o=>o.polygon, getFillColor:o=>[...ramp(TH().green,o.t), state.extruded?235:(state.theme==='light'?185:170)],
+      getLineColor:o=>state.startCell===o.k?TH().cellLine.sel:TH().cellLine.start,
       getLineWidth:o=>state.startCell===o.k?26:6, lineWidthUnits:'meters', stroked:true, filled:true,
       getElevation:o=>elev(o.c),
       onClick:o=>{ if(state.svMode){ const [ln,lt]=cellCentre(o.object.k,step); openSV(lt,ln); } else setStart(o.object.k); return true; },
-      updateTriggers:{getFillColor:[state.extruded],getLineColor:[state.startCell],getLineWidth:[state.startCell],getElevation:[state.extruded,state.cell]}}));
+      updateTriggers:{getFillColor:[state.extruded,state.theme],getLineColor:[state.startCell,state.theme],getLineWidth:[state.startCell],getElevation:[state.extruded,state.cell]}}));
   }
   if(state.layers.end){
     const d = cellData(agg.endCells, agg.maxEnd);
     L.push(new PolygonLayer({id:'endCells', data:d, pickable:true, extruded:state.extruded,
-      getPolygon:o=>o.polygon, getFillColor:o=>[...ramp(CORAL,o.t), state.extruded?230:150],
-      getLineColor:o=>state.endCell===o.k?[255,255,255,255]:[255,122,89,90],
+      getPolygon:o=>o.polygon, getFillColor:o=>[...ramp(TH().coral,o.t), state.extruded?235:(state.theme==='light'?170:150)],
+      getLineColor:o=>state.endCell===o.k?TH().cellLine.sel:TH().cellLine.end,
       getLineWidth:o=>state.endCell===o.k?26:6, lineWidthUnits:'meters', stroked:true, filled:true,
       getElevation:o=>elev(o.c),
       polygonOffset:1,
       onClick:o=>{ if(state.svMode){ const [ln,lt]=cellCentre(o.object.k,step); openSV(lt,ln); } else setEnd(o.object.k); return true; },
-      updateTriggers:{getFillColor:[state.extruded],getLineColor:[state.endCell],getLineWidth:[state.endCell],getElevation:[state.extruded,state.cell]}}));
+      updateTriggers:{getFillColor:[state.extruded,state.theme],getLineColor:[state.endCell,state.theme],getLineWidth:[state.endCell],getElevation:[state.extruded,state.cell]}}));
   }
   if(state.layers.sp || state.layers.ep){
     const pts = [];
@@ -485,18 +513,20 @@ function makeLayers(){
     }
     L.push(new ScatterplotLayer({id:'pts', data:pts, getPosition:o=>o.p, radiusUnits:'meters',
       getRadius:9, radiusMinPixels:1.1, radiusMaxPixels:5,
-      getFillColor:o=>o.s?[155,240,200,120]:[255,177,153,120], pickable:false}));
+      getFillColor:o=>o.s?[...ramp(TH().green,0.72),160]:[...ramp(TH().coral,0.66),160], pickable:false}));
   }
+  const arcT = c => { const s = Math.sqrt(c/agg.maxFlow);
+    return state.theme === 'light' ? 0.55 + 0.45*s : 0.35 + 0.65*s; };
   if(state.layers.flow){
     L.push(new ArcLayer({id:'flows', data:agg.flows.filter(f=>!f.self).slice(0,900), pickable:true,
       getSourcePosition:o=>o.from, getTargetPosition:o=>o.to,
-      getSourceColor:o=>[...ramp(GREEN,0.35+0.65*Math.sqrt(o.c/agg.maxFlow)),210],
-      getTargetColor:o=>[...ramp(CORAL,0.35+0.65*Math.sqrt(o.c/agg.maxFlow)),210],
+      getSourceColor:o=>[...ramp(TH().green, arcT(o.c)), state.theme==='light'?195:210],
+      getTargetColor:o=>[...ramp(TH().coral, arcT(o.c)), state.theme==='light'?195:210],
       getWidth:o=>1+5*Math.sqrt(o.c/agg.maxFlow), getHeight:0.42, greatCircle:false,
       onClick:o=>{
         if(state.svMode){ const [ln,lt]=o.object.from; openSV(lt,ln); return true; }
         setStart(o.object.sk,true); setEnd(o.object.ek); return true; },
-      updateTriggers:{getSourceColor:[agg.maxFlow],getTargetColor:[agg.maxFlow],getWidth:[agg.maxFlow]}}));
+      updateTriggers:{getSourceColor:[agg.maxFlow,state.theme],getTargetColor:[agg.maxFlow,state.theme],getWidth:[agg.maxFlow]}}));
   }
   L.push(...labelLayers());
   return L;
@@ -517,6 +547,17 @@ function tooltip({object, layer}){
       <span style="color:#98A0BF">click to lock both ends</span>`};
   }
   return null;
+}
+
+function setTheme(th){
+  state.theme = th;
+  document.body.dataset.theme = th;
+  $('#themeBtn').textContent = th === 'light' ? '☾ Dark' : '☀ Light';
+  try{ localStorage.setItem('oostende-map.theme', th); }catch(_){}
+  // keep Google's roadmap styling in step with the UI
+  if(state.basemap === 'g-roadmap' && th === 'light'){ state.basemap = 'g-roadmap-light'; $('#basemap').value = state.basemap; applyEngine(); return; }
+  if(state.basemap === 'g-roadmap-light' && th === 'dark'){ state.basemap = 'g-roadmap'; $('#basemap').value = state.basemap; applyEngine(); return; }
+  setLayers(); renderLegend();
 }
 
 /* ---------- map engines: deck.gl canvas vs Google Maps ---------- */
@@ -734,7 +775,7 @@ function renderSelCells(){
   el.querySelectorAll('.x').forEach(x=>x.onclick=()=>{ if(x.dataset.c==='s') state.startCell=null; else state.endCell=null; render(); });
 }
 function renderLegend(){
-  const g = GREEN.map(c=>`rgb(${c})`).join(','), c = CORAL.map(c=>`rgb(${c})`).join(',');
+  const g = TH().green.map(c=>`rgb(${c})`).join(','), c = TH().coral.map(c=>`rgb(${c})`).join(',');
   $('#legend').innerHTML = `
     <div><b>Trips starting</b> per ${state.cell} m cell</div>
     <div class="ramp" style="background:linear-gradient(90deg,${g})"></div>
@@ -821,6 +862,7 @@ function wire(){
     render(); };
   const lmap = {lStart:'start', lEnd:'end', lFlow:'flow', lSp:'sp', lEp:'ep', lLabels:'labels'};
   Object.entries(lmap).forEach(([id,key]) => { $('#'+id).onchange = e => { state.layers[key] = e.target.checked; render(); }; });
+  $('#themeBtn').onclick = () => setTheme(state.theme === 'light' ? 'dark' : 'light');
   const LSKEY = 'oostende-map.tileUrl';
   try{ const saved = localStorage.getItem(LSKEY); if(saved){ state.tileUrl = saved; $('#tileUrl').value = saved; } }catch(_){}
   $('#basemap').onchange = e => {
@@ -880,7 +922,14 @@ const VIEW = {longitude:2.9200, latitude:51.2270, zoom:12.55, pitch:0, bearing:0
        (default ≈250 m); a trip belongs to the cell nearest its pick-up / drop-off point. Flows are aggregated cell→cell and
        drawn only above the minimum-trips threshold (self-loops excluded from arcs, kept in the counts).
        CO₂ saved uses the PathFinder metric <code>(floor(Σdistance/1000)/1.6)×0.215</code>. All times local (Europe/Brussels).`;
+    let th = 'light';
+    try{ th = localStorage.getItem('oostende-map.theme') || 'light'; }catch(_){}
+    state.theme = th;
+    document.body.dataset.theme = th;
+    if(th === 'dark' && state.basemap === 'g-roadmap-light'){ state.basemap = 'g-roadmap'; }
     wire();
+    $('#themeBtn').textContent = th === 'light' ? '☾ Dark' : '☀ Light';
+    $('#basemap').value = state.basemap;
     recompute();
     await applyEngine();
     render();

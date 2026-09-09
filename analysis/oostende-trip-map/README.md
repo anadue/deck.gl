@@ -44,8 +44,12 @@ grid the map uses at its default cell size.
   cells, avg distance, avg duration, total distance, CO₂ saved
   (PathFinder metric `(floor(Σdistance/1000)/1.6)×0.215`).
 - **Charts**: trips per day, trips by hour, top start cells / end cells / flows.
+- **Light by default**, with a ☾/☀ toggle in the header (remembered per browser). The theme drives
+  more than the chrome: the cell and flow ramps invert between themes — pale→deep on a light map,
+  deep→bright on a dark one, with a lifted floor on light so low-count cells stay visible — and the
+  Google roadmap style follows the toggle. The header bar stays brand navy in both.
 - **Basemap**, several ways:
-  - **Google Maps** — streets (dark), streets (light), satellite, satellite + labels, and terrain,
+  - **Google Maps** — streets (light, the default), streets (dark), satellite, satellite + labels, and terrain,
     drawn by the Maps JavaScript API with the deck.gl layers on top through `GoogleMapsOverlay`.
     **Street View**: drag Google's pegman, or tick "Street View — click the map to look" and click
     any point or cell to open a panorama panel (cell filtering pauses while that is on).
